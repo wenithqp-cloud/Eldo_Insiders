@@ -7,9 +7,9 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:"Arial Black","Arial",sans-serif;}
 body{display:flex;height:100vh;background-color:#fff8e1;color:#3b0000;overflow:hidden;}
-.sidebar{width:250px;background-color:#800000;color:#ffd700;display:flex;flex-direction:column;justify-content:space-between;padding:20px;position:relative;}
-.sidebar h1{font-size:30px;margin-bottom:30px;text-align:center;text-transform:uppercase;letter-spacing:2px;text-shadow:1px 1px #000;}
-.nav-tabs{display:flex;flex-direction:column;gap:15px;}
+.sidebar{width:250px;background-color:#800000;color:#ffd700;display:flex;flex-direction:column;justify-content:flex-start;padding:20px;position:relative;}
+.sidebar h1{font-size:30px;margin-bottom:15px;text-align:center;text-transform:uppercase;letter-spacing:2px;text-shadow:1px 1px #000;cursor:pointer;}
+.nav-tabs{display:flex;flex-direction:column;gap:15px;margin-top:10px;}
 .nav-tabs button{background:none;border:none;color:#ffd700;text-align:left;padding:10px 15px;font-size:18px;cursor:pointer;transition:background 0.3s;font-weight:bold;text-shadow:1px 1px #3b0000;}
 .nav-tabs button:hover, .nav-tabs button.active{background-color:#660000;}
 .main-content{flex:1;overflow-y:auto;padding:25px;}
@@ -19,21 +19,28 @@ body{display:flex;height:100vh;background-color:#fff8e1;color:#3b0000;overflow:h
 .news-item img, .video-item iframe{max-width:100%;height:auto;margin-bottom:15px;border:2px solid #ffd700;border-radius:5px;}
 .news-item h3, .video-item h3{font-size:24px;margin-bottom:10px;color:#660000;text-shadow:1px 1px #ffd700;}
 .news-item p{font-size:16px;line-height:1.5;}
-.admin-login{background-color:#fff8e1;border:2px solid #ffd700;padding:15px;border-radius:5px;display:none;}
+.admin-login{background-color:#fff8e1;border:2px solid #ffd700;padding:15px;border-radius:5px;margin-bottom:20px;}
 .admin-login h3{margin-bottom:10px;color:#800000;text-align:center;}
 .admin-login input{width:100%;padding:8px;margin-bottom:10px;border:1px solid #ccc;border-radius:3px;}
 .admin-login button{width:100%;padding:10px;background-color:#ffd700;color:#800000;border:none;cursor:pointer;font-weight:bold;}
 .admin-login button:hover{background-color:#e6c200;}
 .edit-btn,.delete-btn,.save-btn{position:absolute;top:10px;right:10px;background:#ffd700;color:#800000;border:none;padding:5px 8px;margin-left:5px;cursor:pointer;border-radius:3px;font-weight:bold;}
 .edit-btn:hover,.delete-btn:hover,.save-btn:hover{background:#e6c200;}
-.invisible-btn{position:absolute;bottom:10px;left:10px;width:30px;height:30px;opacity:0;cursor:pointer;}
 @media(max-width:768px){body{flex-direction:column;}.sidebar{width:100%;flex-direction:row;overflow-x:auto;}.nav-tabs{flex-direction:row;gap:10px;}.main-content{padding:15px;}}
 </style>
 </head>
 <body>
 
 <div class="sidebar">
-<h1>Eldo Insiders</h1>
+<h1 onclick="toggleAdmin()">Eldo Insiders</h1>
+<div class="admin-login" id="adminLoginForm">
+<h3>Admin Login</h3>
+<input type="text" id="adminUser" placeholder="Username">
+<input type="password" id="adminPass" placeholder="Password">
+<button onclick="adminLogin()">Login</button>
+<p id="loginMsg" style="color:red;font-size:14px;text-align:center;margin-top:5px;"></p>
+</div>
+
 <div class="nav-tabs">
 <button class="tab-btn active" data-tab="home">Home</button>
 <button class="tab-btn" data-tab="latest">Latest News</button>
@@ -41,17 +48,6 @@ body{display:flex;height:100vh;background-color:#fff8e1;color:#3b0000;overflow:h
 <button class="tab-btn" data-tab="sports">Sports</button>
 <button class="tab-btn" data-tab="entertainment">Entertainment</button>
 <button class="tab-btn" data-tab="videos">Videos</button>
-</div>
-
-<!-- Invisible button to reveal admin login -->
-<div class="invisible-btn" onclick="toggleAdmin()"></div>
-
-<div class="admin-login" id="adminLoginForm">
-<h3>Admin Login</h3>
-<input type="text" id="adminUser" placeholder="Username">
-<input type="password" id="adminPass" placeholder="Password">
-<button onclick="adminLogin()">Login</button>
-<p id="loginMsg" style="color:red;font-size:14px;text-align:center;margin-top:5px;"></p>
 </div>
 </div>
 
@@ -77,11 +73,13 @@ const tab = btn.getAttribute('data-tab');
 tabContents.forEach(c=>c.style.display=(c.id===tab?'block':'none'));
 });
 });
-// Admin toggle
+
+// Admin toggle (logo click)
 function toggleAdmin(){
 const f=document.getElementById('adminLoginForm');
 f.style.display = (f.style.display==='block')?'none':'block';
 }
+
 // Admin login
 function adminLogin(){
 const user=document.getElementById('adminUser').value;
@@ -94,6 +92,7 @@ msg.innerText='Admin access granted!';
 renderAll();
 }else{msg.style.color='red';msg.innerText='Invalid credentials';}
 }
+
 // Load / Save news to localStorage
 function loadData(){
 const data = JSON.parse(localStorage.getItem('eldodata')||'{}');
@@ -110,6 +109,7 @@ window.eldoData=JSON.parse(localStorage.getItem('eldodata'));
 renderAll();
 }
 function saveData(){localStorage.setItem('eldodata',JSON.stringify(window.eldoData));}
+
 // Render
 function renderAll(){
 for(const tab in eldoData){
@@ -127,6 +127,7 @@ container.appendChild(div);
 });
 if(isAdmin){const main=document.querySelector('.main-content');let addBtn=document.getElementById('addNewsBtn');if(!addBtn){addBtn=document.createElement('button');addBtn.innerText='Add Item';addBtn.style.marginBottom='20px';addBtn.id='addNewsBtn';addBtn.onclick=addItem;main.prepend(addBtn);}}}
 }
+
 // Admin functions
 function editItem(tab,index){let item=window.eldoData[tab][index];if(tab==='videos'){const t=prompt('Edit Title',item.title);if(t)item.title=t;const u=prompt('Edit Video URL',item.url);if(u)item.url=u;}else{const t=prompt('Edit Title',item.title);if(t)item.title=t;const txt=prompt('Edit Text',item.text);if(txt)item.text=txt;const img=prompt('Edit Image URL',item.img);if(img)item.img=img;}saveData();renderAll();}
 function addItem(){const tab=prompt('Which tab? home/latest/features/sports/entertainment/videos');if(!tab || !window.eldoData[tab])return alert('Invalid tab');if(tab==='videos'){const title=prompt('Video Title:');const url=prompt('Video URL:');if(title && url) window.eldoData[tab].push({title,url});}else{const title=prompt('Title:'), text=prompt('Text:'), img=prompt('Image URL:','https://via.placeholder.com/600x300');if(title && text) window.eldoData[tab].push({title,text,img});}saveData();renderAll();}
