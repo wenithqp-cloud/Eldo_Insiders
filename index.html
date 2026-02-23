@@ -13,25 +13,31 @@ body{display:flex;height:100vh;background-color:#fff8e1;color:#3b0000;overflow:h
 .nav-tabs button{background:none;border:none;color:#ffd700;text-align:left;padding:10px 15px;font-size:18px;cursor:pointer;transition:background 0.3s;font-weight:bold;text-shadow:1px 1px #3b0000;}
 .nav-tabs button:hover, .nav-tabs button.active{background-color:#660000;}
 .main-content{flex:1;overflow-y:auto;padding:25px;position:relative;}
+.main-content h2{color:#800000;margin-bottom:25px;font-size:36px;border-bottom:4px solid #ffd700;display:inline-block;text-shadow:1px 1px #000;}
 .news-item, .video-item{border-bottom:2px solid #ffd700;margin-bottom:25px;padding:15px;position:relative;background:#fff5d6;border-radius:5px;}
 .news-item img, .video-item iframe{max-width:100%;height:auto;margin-bottom:15px;border:2px solid #ffd700;border-radius:5px;}
 .news-item h3, .video-item h3{font-size:24px;margin-bottom:10px;color:#660000;text-shadow:1px 1px #ffd700;}
 .news-item p{font-size:16px;line-height:1.5;}
-#ticker-container{width:100%;background:#800000;color:#ffd700;overflow:hidden;border-bottom:4px solid #ffd700;padding:5px 0;margin-bottom:20px;cursor:pointer;}
+#ticker-container{width:100%;background:#800000;color:#ffd700;overflow:hidden;border-bottom:4px solid #ffd700;padding:5px 0;margin-bottom:20px;}
 #ticker{display:inline-block;white-space:nowrap;position:relative;animation:scrollTicker 20s linear infinite;font-weight:bold;}
 @keyframes scrollTicker{0%{left:100%;}100%{left:-100%;}}
 .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;z-index:1000;}
-.modal-content{background:#fff8e1;padding:20px;border:2px solid #ffd700;border-radius:10px;width:350px;position:relative;}
+.modal-content{background:#fff8e1;padding:20px;border:2px solid #ffd700;border-radius:10px;width:300px;position:relative;}
 .modal-content h3{color:#800000;text-align:center;margin-bottom:10px;}
-.modal-content input, .modal-content textarea{width:100%;padding:8px;margin-bottom:10px;border:1px solid #ccc;border-radius:3px;}
-.modal-content button{width:100%;padding:10px;background-color:#ffd700;color:#800000;border:none;cursor:pointer;font-weight:bold;margin-top:5px;}
+.modal-content input{width:100%;padding:8px;margin-bottom:10px;border:1px solid #ccc;border-radius:3px;}
+.modal-content button{width:100%;padding:10px;background-color:#ffd700;color:#800000;border:none;cursor:pointer;font-weight:bold;}
 .modal-content button:hover{background-color:#e6c200;}
 .close-btn{position:absolute;top:5px;right:10px;font-size:20px;font-weight:bold;cursor:pointer;color:#800000;}
-.edit-btn,.delete-btn,.move-btn{position:absolute;right:10px;background:#ffd700;color:#800000;border:none;padding:5px 8px;margin-left:5px;cursor:pointer;border-radius:3px;font-weight:bold;}
-.edit-btn:hover,.delete-btn:hover,.move-btn:hover{background:#e6c200;}
-.move-btn{width:35px;text-align:center;}
+.edit-btn,.delete-btn{position:absolute;top:10px;right:10px;background:#ffd700;color:#800000;border:none;padding:5px 8px;margin-left:5px;cursor:pointer;border-radius:3px;font-weight:bold;}
+.edit-btn:hover,.delete-btn:hover{background:#e6c200;}
 #addSectionBtn{display:none;margin-top:20px;padding:10px;background:#ffd700;color:#800000;border:none;border-radius:5px;font-weight:bold;cursor:pointer;}
 #addSectionBtn:hover{background:#e6c200;}
+#emoji-bar{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;}
+.emoji-btn{cursor:pointer;font-size:20px;}
+.ticker-edit-container{display:none;margin-bottom:10px;}
+#ticker-input{width:100%;padding:8px;border-radius:3px;border:1px solid #ccc;margin-bottom:5px;}
+#saveTickerBtn{padding:5px 10px;background:#ffd700;color:#800000;border:none;cursor:pointer;border-radius:3px;font-weight:bold;}
+#saveTickerBtn:hover{background:#e6c200;}
 @media(max-width:768px){body{flex-direction:column;}.sidebar{width:100%;flex-direction:row;overflow-x:auto;}.nav-tabs{flex-direction:row;gap:10px;}.main-content{padding:15px;}}
 </style>
 </head>
@@ -55,42 +61,23 @@ body{display:flex;height:100vh;background-color:#fff8e1;color:#3b0000;overflow:h
 </div>
 </div>
 
-<!-- Modal Edit Item -->
-<div class="modal" id="editModal">
-<div class="modal-content">
-<span class="close-btn" onclick="closeEditModal()">&times;</span>
-<h3 id="editModalTitle">Edit Item</h3>
-<input type="text" id="itemTitle" placeholder="Title">
-<textarea id="itemText" rows="4" placeholder="Text (for news)"></textarea>
-<input type="text" id="itemImg" placeholder="Image URL (for news)">
-<input type="text" id="itemUrl" placeholder="Video URL (for video)">
-<button onclick="saveEditItem()">Save</button>
-</div>
-</div>
-
-<!-- Modal Edit Ticker -->
-<div class="modal" id="tickerModal">
-<div class="modal-content">
-<span class="close-btn" onclick="closeTickerModal()">&times;</span>
-<h3>Edit Ticker</h3>
-<textarea id="tickerInput" rows="3" placeholder="Separate items with |"></textarea>
-<button onclick="saveTicker()">Save</button>
-</div>
-</div>
-
 <div class="main-content">
-<div id="ticker-container"><div id="ticker"></div></div>
+<div id="ticker-container">
+  <div id="ticker"></div>
+  <div class="ticker-edit-container" id="tickerEditor">
+    <input type="text" id="ticker-input" placeholder="Edit ticker items (separate with |)">
+    <button id="saveTickerBtn">Save</button>
+    <div id="emoji-bar"></div>
+  </div>
+</div>
 <div id="tabContents"></div>
 </div>
 
 <script>
 let isAdmin=false;
-let editingItem={tabIndex:null,itemIndex:null};
 
 document.getElementById('logoButton').onclick=()=>document.getElementById('loginModal').style.display='flex';
 function closeLogin(){document.getElementById('loginModal').style.display='none';}
-function closeEditModal(){document.getElementById('editModal').style.display='none';}
-function closeTickerModal(){document.getElementById('tickerModal').style.display='none';}
 
 // Admin login
 function adminLogin(){
@@ -103,6 +90,7 @@ msg.style.color='green';
 msg.innerText='Admin access granted!';
 closeLogin();
 document.getElementById('addSectionBtn').style.display='block';
+document.getElementById('tickerEditor').style.display='block';
 renderSite();
 }else{msg.style.color='red';msg.innerText='Invalid credentials';}
 }
@@ -179,7 +167,7 @@ document.querySelectorAll('.tab-btn')[idx].classList.add('active');
 document.querySelectorAll('.tab-content').forEach((c,i)=>c.style.display=(i===idx?'block':'none'));
 }
 
-// Render item
+// Render single item
 function renderItem(tab,tabIndex,item,itemIndex){
 let container=document.getElementById('tab-'+tabIndex);
 let div=document.createElement('div');
@@ -187,44 +175,27 @@ div.className=(item.type==="video")?"video-item":"news-item";
 if(item.type==="video") div.innerHTML=`<h3>${item.title}</h3><iframe width="560" height="315" src="${item.url}" frameborder="0" allowfullscreen></iframe>`;
 else div.innerHTML=`<img src="${item.img}"><h3>${item.title}</h3><p>${item.text}</p>`;
 
+// Admin buttons for this item
 if(isAdmin){
-let topOffset=10;
-let editBtn=document.createElement('button'); editBtn.innerText='Edit'; editBtn.className='edit-btn';
-editBtn.style.top=topOffset+'px'; editBtn.onclick=()=>openEditModal(tabIndex,itemIndex); div.appendChild(editBtn);
-topOffset+=35;
+let editBtn=document.createElement('button');editBtn.innerText='Edit';editBtn.className='edit-btn';
+editBtn.onclick=()=>editItem(tabIndex,itemIndex);div.appendChild(editBtn);
 
-let delBtn=document.createElement('button'); delBtn.innerText='Delete'; delBtn.className='delete-btn';
-delBtn.style.top=topOffset+'px'; delBtn.onclick=()=>{window.eldoData.tabs[tabIndex].items.splice(itemIndex,1); saveAndRender();}; div.appendChild(delBtn);
-topOffset+=35;
-
-if(itemIndex>0){let upBtn=document.createElement('button'); upBtn.innerText='↑'; upBtn.className='move-btn';
-upBtn.style.top=topOffset+'px'; upBtn.onclick=()=>{let items=window.eldoData.tabs[tabIndex].items; [items[itemIndex-1],items[itemIndex]]=[items[itemIndex],items[itemIndex-1]]; saveAndRender();}; div.appendChild(upBtn); topOffset+=35;}
-if(itemIndex<window.eldoData.tabs[tabIndex].items.length-1){let downBtn=document.createElement('button'); downBtn.innerText='↓'; downBtn.className='move-btn';
-downBtn.style.top=topOffset+'px'; downBtn.onclick=()=>{let items=window.eldoData.tabs[tabIndex].items; [items[itemIndex],items[itemIndex+1]]=[items[itemIndex+1],items[itemIndex]]; saveAndRender();}; div.appendChild(downBtn);}
-}
+let delBtn=document.createElement('button');delBtn.innerText='Delete';delBtn.className='delete-btn';
+delBtn.onclick=()=>{window.eldoData.tabs[tabIndex].items.splice(itemIndex,1);saveAndRender();};div.appendChild(delBtn);}
 container.appendChild(div);
 }
 
-// Open edit modal
-function openEditModal(tabIndex,itemIndex){
-editingItem={tabIndex,itemIndex};
+// Edit item
+function editItem(tabIndex,itemIndex){
 let item=window.eldoData.tabs[tabIndex].items[itemIndex];
-document.getElementById('editModalTitle').innerText=item.type==="video"?"Edit Video":"Edit News";
-document.getElementById('itemTitle').value=item.title||"";
-document.getElementById('itemText').value=item.text||"";
-document.getElementById('itemImg').value=item.img||"";
-document.getElementById('itemUrl').value=item.url||"";
-document.getElementById('editModal').style.display='flex';
+if(item.type==="video"){
+let t=prompt("Title",item.title); if(t)item.title=t;
+let u=prompt("Video URL",item.url); if(u)item.url=u;
+}else{
+let t=prompt("Title",item.title); if(t)item.title=t;
+let txt=prompt("Text",item.text); if(txt)item.text=txt;
+let img=prompt("Image URL",item.img); if(img)item.img=img;
 }
-
-// Save edit modal
-function saveEditItem(){
-let {tabIndex,itemIndex}=editingItem;
-let item=window.eldoData.tabs[tabIndex].items[itemIndex];
-item.title=document.getElementById('itemTitle').value;
-if(item.type==="news"){item.text=document.getElementById('itemText').value; item.img=document.getElementById('itemImg').value;}
-else{item.url=document.getElementById('itemUrl').value;}
-closeEditModal();
 saveAndRender();
 }
 
@@ -238,37 +209,46 @@ else{let t=prompt("Video Title"); let url=prompt("Video URL"); if(t && url) wind
 saveAndRender();
 }
 
-// Edit section
+// Edit section name
 function editSection(idx){
 let name=prompt("New Section Name",window.eldoData.tabs[idx].name);
 if(name) window.eldoData.tabs[idx].name=name;
 saveAndRender();
 }
 
-// Add section
+// Add new section button
 document.getElementById('addSectionBtn').onclick=()=>{
 if(!isAdmin)return alert("Admin only!");
 let name=prompt("New Section Name");
 if(name) window.eldoData.tabs.push({name:name,items:[]}); saveAndRender();
 }
 
-// Ticker render
-function renderTicker(){document.getElementById('ticker').innerText=(window.eldoData.ticker||[]).join(" ⚡ ");}
-document.getElementById('ticker').onclick=()=>{
-if(!isAdmin) return;
-document.getElementById('tickerInput').value=window.eldoData.ticker.join("|");
-document.getElementById('tickerModal').style.display='flex';
-}
+// Ticker
+function renderTicker(){
+document.getElementById('ticker').innerText=(window.eldoData.ticker||[]).join(" ⚡ ");
+if(isAdmin){
+let tickerInput=document.getElementById('ticker-input');
+tickerInput.value=(window.eldoData.ticker||[]).join("|");
+
+// Emoji bar
+const emojiBar=document.getElementById('emoji-bar');
+emojiBar.innerHTML="";
+const emojis=["🔥","⚡","🎉","📢","⭐","🎬","🏆"];
+emojis.forEach(e=>{
+let btn=document.createElement('span');
+btn.innerText=e; btn.className="emoji-btn";
+btn.onclick=()=>{tickerInput.value+=e;};
+emojiBar.appendChild(btn);
+});
 
 // Save ticker
-function saveTicker(){
-let val=document.getElementById('tickerInput').value;
-window.eldoData.ticker=val.split("|").map(t=>t.trim());
-closeTickerModal();
+document.getElementById('saveTickerBtn').onclick=()=>{
+window.eldoData.ticker=tickerInput.value.split("|");
 saveAndRender();
+};
+}
 }
 
-// Save
 function saveAndRender(){localStorage.setItem('eldodata',JSON.stringify(window.eldoData)); renderSite();}
 
 loadData();
