@@ -28,8 +28,9 @@ body{display:flex;height:100vh;background-color:#fff8e1;color:#3b0000;overflow:h
 .modal-content button{width:100%;padding:10px;background-color:#ffd700;color:#800000;border:none;cursor:pointer;font-weight:bold;}
 .modal-content button:hover{background-color:#e6c200;}
 .close-btn{position:absolute;top:5px;right:10px;font-size:20px;font-weight:bold;cursor:pointer;color:#800000;}
-.edit-btn,.delete-btn{position:absolute;right:10px;background:#ffd700;color:#800000;border:none;padding:5px 8px;margin-left:5px;cursor:pointer;border-radius:3px;font-weight:bold;}
-.edit-btn:hover,.delete-btn:hover{background:#e6c200;}
+.edit-btn,.delete-btn,.move-btn{position:absolute;right:10px;background:#ffd700;color:#800000;border:none;padding:5px 8px;margin-left:5px;cursor:pointer;border-radius:3px;font-weight:bold;}
+.edit-btn:hover,.delete-btn:hover,.move-btn:hover{background:#e6c200;}
+.move-btn{width:35px;text-align:center;}
 #addSectionBtn{display:none;margin-top:20px;padding:10px;background:#ffd700;color:#800000;border:none;border-radius:5px;font-weight:bold;cursor:pointer;}
 #addSectionBtn:hover{background:#e6c200;}
 @media(max-width:768px){body{flex-direction:column;}.sidebar{width:100%;flex-direction:row;overflow-x:auto;}.nav-tabs{flex-direction:row;gap:10px;}.main-content{padding:15px;}}
@@ -153,7 +154,7 @@ document.querySelectorAll('.tab-btn')[idx].classList.add('active');
 document.querySelectorAll('.tab-content').forEach((c,i)=>c.style.display=(i===idx?'block':'none'));
 }
 
-// Render single item with edit/delete/move for admin
+// Render single item with edit/delete/move
 function renderItem(tab,tabIndex,item,itemIndex){
 let container=document.getElementById('tab-'+tabIndex);
 let div=document.createElement('div');
@@ -162,31 +163,33 @@ if(item.type==="video") div.innerHTML=`<h3>${item.title}</h3><iframe width="560"
 else div.innerHTML=`<img src="${item.img}"><h3>${item.title}</h3><p>${item.text}</p>`;
 
 if(isAdmin){
-  // Edit button
+  let topOffset=10;
+  // Edit
   let editBtn=document.createElement('button'); editBtn.innerText='Edit'; editBtn.className='edit-btn';
-  editBtn.onclick=()=>editItem(tabIndex,itemIndex); div.appendChild(editBtn);
+  editBtn.style.top=topOffset+'px'; editBtn.onclick=()=>editItem(tabIndex,itemIndex); div.appendChild(editBtn);
+  topOffset+=35;
 
-  // Delete button
+  // Delete
   let delBtn=document.createElement('button'); delBtn.innerText='Delete'; delBtn.className='delete-btn';
-  delBtn.onclick=()=>{window.eldoData.tabs[tabIndex].items.splice(itemIndex,1); saveAndRender();}; div.appendChild(delBtn);
+  delBtn.style.top=topOffset+'px'; delBtn.onclick=()=>{window.eldoData.tabs[tabIndex].items.splice(itemIndex,1); saveAndRender();}; div.appendChild(delBtn);
+  topOffset+=35;
 
-  // Move Up button
+  // Move Up
   if(itemIndex>0){
-    let upBtn=document.createElement('button'); upBtn.innerText='↑'; upBtn.className='edit-btn';
-    upBtn.style.top='40px';
-    upBtn.onclick=()=>{
+    let upBtn=document.createElement('button'); upBtn.innerText='↑'; upBtn.className='move-btn';
+    upBtn.style.top=topOffset+'px'; upBtn.onclick=()=>{
       let items=window.eldoData.tabs[tabIndex].items;
       [items[itemIndex-1], items[itemIndex]]=[items[itemIndex], items[itemIndex-1]];
       saveAndRender();
     };
     div.appendChild(upBtn);
+    topOffset+=35;
   }
 
-  // Move Down button
-  if(itemIndex < window.eldoData.tabs[tabIndex].items.length-1){
-    let downBtn=document.createElement('button'); downBtn.innerText='↓'; downBtn.className='edit-btn';
-    downBtn.style.top='70px';
-    downBtn.onclick=()=>{
+  // Move Down
+  if(itemIndex<window.eldoData.tabs[tabIndex].items.length-1){
+    let downBtn=document.createElement('button'); downBtn.innerText='↓'; downBtn.className='move-btn';
+    downBtn.style.top=topOffset+'px'; downBtn.onclick=()=>{
       let items=window.eldoData.tabs[tabIndex].items;
       [items[itemIndex], items[itemIndex+1]]=[items[itemIndex+1], items[itemIndex]];
       saveAndRender();
@@ -238,7 +241,9 @@ if(name) window.eldoData.tabs.push({name:name,items:[]}); saveAndRender();
 // Ticker
 function renderTicker(){document.getElementById('ticker').innerText=(window.eldoData.ticker||[]).join(" ⚡ ");}
 document.getElementById('ticker').onclick=()=>{
-if(!isAdmin) return; let t=prompt("Edit Ticker (separate with |)",window.eldoData.ticker.join("|")); if(t) window.eldoData.ticker=t.split("|"); saveAndRender();
+if(!isAdmin) return; 
+let t=prompt("Edit Ticker (separate with |)",window.eldoData.ticker.join("|")); 
+if(t) window.eldoData.ticker=t.split("|"); saveAndRender();
 }
 
 // Save and rerender
