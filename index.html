@@ -5,244 +5,133 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Eldo Insiders - School News</title>
 <style>
-/* ================= GLOBAL ================= */
-* {margin:0;padding:0;box-sizing:border-box;font-family:"Arial",sans-serif;}
-body {display:flex;height:100vh;background-color:#fff8e1;color:#3b0000;}
-
-/* ================= SIDEBAR ================= */
-.sidebar {
-  width: 250px;
-  background-color:#800000; /* maroon */
-  color: #ffd700; /* gold */
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  padding:20px;
-}
-.sidebar h1 {
-  font-size:28px;
-  margin-bottom:30px;
-  text-align:center;
-  text-transform:uppercase;
-  letter-spacing:1px;
-}
-.nav-tabs {display:flex;flex-direction:column;gap:15px;}
-.nav-tabs button {
-  background:none;
-  border:none;
-  color:#ffd700;
-  text-align:left;
-  padding:10px 15px;
-  font-size:16px;
-  cursor:pointer;
-  transition:background 0.3s;
-}
-.nav-tabs button:hover, .nav-tabs button.active {background-color:#660000;}
-
-/* ================= MAIN CONTENT ================= */
-.main-content {
-  flex:1;
-  overflow-y:auto;
-  padding:25px;
-}
-.main-content h2 {color:#800000;margin-bottom:20px;font-size:32px;border-bottom:3px solid #ffd700;display:inline-block;}
-.news-item {border-bottom:1px solid #ddd;margin-bottom:20px;padding-bottom:20px;position:relative;}
-.news-item img {max-width:100%;height:auto;margin-bottom:10px;}
-.news-item h3 {font-size:22px;margin-bottom:10px;color:#660000;}
-.news-item p {font-size:16px;line-height:1.5;}
-
-/* ================= ADMIN LOGIN ================= */
-.admin-login {background-color:#fff8e1;border:2px solid #ffd700;padding:15px;border-radius:5px;}
-.admin-login h3 {margin-bottom:10px;color:#800000;text-align:center;}
-.admin-login input {width:100%;padding:8px;margin-bottom:10px;border:1px solid #ccc;border-radius:3px;}
-.admin-login button {width:100%;padding:10px;background-color:#ffd700;color:#800000;border:none;cursor:pointer;font-weight:bold;}
-.admin-login button:hover {background-color:#e6c200;}
-
-/* ================= BUTTONS ================= */
-.edit-btn, .delete-btn, .save-btn {position:absolute;top:10px;right:10px;background:#ffd700;color:#800000;border:none;padding:5px 8px;margin-left:5px;cursor:pointer;border-radius:3px;}
-.edit-btn:hover, .delete-btn:hover, .save-btn:hover {background:#e6c200;}
-
-/* ================= RESPONSIVE ================= */
-@media(max-width:768px){
-  body{flex-direction:column;}
-  .sidebar{width:100%;flex-direction:row;overflow-x:auto;}
-  .nav-tabs{flex-direction:row;gap:10px;}
-  .main-content{padding:15px;}
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Arial Black","Arial",sans-serif;}
+body{display:flex;height:100vh;background-color:#fff8e1;color:#3b0000;overflow:hidden;}
+.sidebar{width:250px;background-color:#800000;color:#ffd700;display:flex;flex-direction:column;justify-content:space-between;padding:20px;position:relative;}
+.sidebar h1{font-size:30px;margin-bottom:30px;text-align:center;text-transform:uppercase;letter-spacing:2px;text-shadow:1px 1px #000;}
+.nav-tabs{display:flex;flex-direction:column;gap:15px;}
+.nav-tabs button{background:none;border:none;color:#ffd700;text-align:left;padding:10px 15px;font-size:18px;cursor:pointer;transition:background 0.3s;font-weight:bold;text-shadow:1px 1px #3b0000;}
+.nav-tabs button:hover, .nav-tabs button.active{background-color:#660000;}
+.main-content{flex:1;overflow-y:auto;padding:25px;}
+.main-content h2{color:#800000;margin-bottom:25px;font-size:36px;border-bottom:4px solid #ffd700;display:inline-block;text-shadow:1px 1px #000;}
+.news-item, .video-item{border-bottom:2px solid #ffd700;margin-bottom:25px;padding:15px;position:relative;background:#fff5d6;border-radius:5px;transition:transform 0.2s,box-shadow 0.2s;}
+.news-item:hover, .video-item:hover{transform:translateY(-5px);box-shadow:0 5px 15px rgba(0,0,0,0.3);}
+.news-item img, .video-item iframe{max-width:100%;height:auto;margin-bottom:15px;border:2px solid #ffd700;border-radius:5px;}
+.news-item h3, .video-item h3{font-size:24px;margin-bottom:10px;color:#660000;text-shadow:1px 1px #ffd700;}
+.news-item p{font-size:16px;line-height:1.5;}
+.admin-login{background-color:#fff8e1;border:2px solid #ffd700;padding:15px;border-radius:5px;display:none;}
+.admin-login h3{margin-bottom:10px;color:#800000;text-align:center;}
+.admin-login input{width:100%;padding:8px;margin-bottom:10px;border:1px solid #ccc;border-radius:3px;}
+.admin-login button{width:100%;padding:10px;background-color:#ffd700;color:#800000;border:none;cursor:pointer;font-weight:bold;}
+.admin-login button:hover{background-color:#e6c200;}
+.edit-btn,.delete-btn,.save-btn{position:absolute;top:10px;right:10px;background:#ffd700;color:#800000;border:none;padding:5px 8px;margin-left:5px;cursor:pointer;border-radius:3px;font-weight:bold;}
+.edit-btn:hover,.delete-btn:hover,.save-btn:hover{background:#e6c200;}
+.invisible-btn{position:absolute;bottom:10px;left:10px;width:30px;height:30px;opacity:0;cursor:pointer;}
+@media(max-width:768px){body{flex-direction:column;}.sidebar{width:100%;flex-direction:row;overflow-x:auto;}.nav-tabs{flex-direction:row;gap:10px;}.main-content{padding:15px;}}
 </style>
 </head>
 <body>
 
-<!-- ================= SIDEBAR ================= -->
 <div class="sidebar">
-  <h1>Eldo Insiders</h1>
-  <div class="nav-tabs">
-    <button class="tab-btn active" data-tab="home">Home</button>
-    <button class="tab-btn" data-tab="latest">Latest News</button>
-    <button class="tab-btn" data-tab="features">Features</button>
-    <button class="tab-btn" data-tab="sports">Sports</button>
-    <button class="tab-btn" data-tab="entertainment">Entertainment</button>
-  </div>
-  <div class="admin-login">
-    <h3>Admin Login</h3>
-    <input type="text" id="adminUser" placeholder="Username">
-    <input type="password" id="adminPass" placeholder="Password">
-    <button onclick="adminLogin()">Login</button>
-    <p id="loginMsg" style="color:red;font-size:14px;text-align:center;margin-top:5px;"></p>
-  </div>
+<h1>Eldo Insiders</h1>
+<div class="nav-tabs">
+<button class="tab-btn active" data-tab="home">Home</button>
+<button class="tab-btn" data-tab="latest">Latest News</button>
+<button class="tab-btn" data-tab="features">Features</button>
+<button class="tab-btn" data-tab="sports">Sports</button>
+<button class="tab-btn" data-tab="entertainment">Entertainment</button>
+<button class="tab-btn" data-tab="videos">Videos</button>
 </div>
 
-<!-- ================= MAIN CONTENT ================= -->
+<!-- Invisible button to reveal admin login -->
+<div class="invisible-btn" onclick="toggleAdmin()"></div>
+
+<div class="admin-login" id="adminLoginForm">
+<h3>Admin Login</h3>
+<input type="text" id="adminUser" placeholder="Username">
+<input type="password" id="adminPass" placeholder="Password">
+<button onclick="adminLogin()">Login</button>
+<p id="loginMsg" style="color:red;font-size:14px;text-align:center;margin-top:5px;"></p>
+</div>
+</div>
+
 <div class="main-content">
-  <!-- Home -->
-  <div class="tab-content" id="home">
-    <h2>Welcome to Eldo Insiders</h2>
-    <div class="news-item">
-      <img src="https://via.placeholder.com/600x300" alt="News">
-      <h3>School Year Kickoff!</h3>
-      <p>Students and staff gathered to celebrate the start of a new school year with exciting events and announcements.</p>
-    </div>
-    <div class="news-item">
-      <img src="https://via.placeholder.com/600x300" alt="News">
-      <h3>Club Fair Highlights</h3>
-      <p>Our reporters covered the annual club fair where students discovered opportunities to join new activities and meet peers.</p>
-    </div>
-  </div>
-
-  <!-- Latest News -->
-  <div class="tab-content" id="latest" style="display:none">
-    <h2>Latest News</h2>
-    <div class="news-item">
-      <img src="https://via.placeholder.com/600x300" alt="Latest">
-      <h3>New Cafeteria Menu</h3>
-      <p>The cafeteria introduces healthier options this semester, including vegan and gluten-free meals.</p>
-    </div>
-  </div>
-
-  <!-- Features -->
-  <div class="tab-content" id="features" style="display:none">
-    <h2>Features</h2>
-    <div class="news-item">
-      <img src="https://via.placeholder.com/600x300" alt="Feature">
-      <h3>Student Spotlight: Jane Doe</h3>
-      <p>Jane shares her journey as a young journalist covering school events and inspiring others to get involved.</p>
-    </div>
-  </div>
-
-  <!-- Sports -->
-  <div class="tab-content" id="sports" style="display:none">
-    <h2>Sports</h2>
-    <div class="news-item">
-      <img src="https://via.placeholder.com/600x300" alt="Sports">
-      <h3>Basketball Team Wins Championship</h3>
-      <p>The Eldorado High team clinched the regional championship with a thrilling last-minute play!</p>
-    </div>
-  </div>
-
-  <!-- Entertainment -->
-  <div class="tab-content" id="entertainment" style="display:none">
-    <h2>Entertainment</h2>
-    <div class="news-item">
-      <img src="https://via.placeholder.com/600x300" alt="Entertainment">
-      <h3>Drama Club Presents 'Romeo & Juliet'</h3>
-      <p>The drama club dazzles audiences with their latest performance of Shakespeare’s classic.</p>
-    </div>
-  </div>
+<div class="tab-content" id="home"></div>
+<div class="tab-content" id="latest" style="display:none"></div>
+<div class="tab-content" id="features" style="display:none"></div>
+<div class="tab-content" id="sports" style="display:none"></div>
+<div class="tab-content" id="entertainment" style="display:none"></div>
+<div class="tab-content" id="videos" style="display:none"></div>
 </div>
 
-<!-- ================= JAVASCRIPT ================= -->
 <script>
+// Tabs
 const tabButtons = document.querySelectorAll('.tab-btn');
 const tabContents = document.querySelectorAll('.tab-content');
 let isAdmin = false;
-
-// Tab switching
-tabButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    tabButtons.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const tab = btn.getAttribute('data-tab');
-    tabContents.forEach(content => content.style.display = content.id === tab ? 'block' : 'none');
-  });
+tabButtons.forEach(btn=>{
+btn.addEventListener('click',()=>{
+tabButtons.forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+const tab = btn.getAttribute('data-tab');
+tabContents.forEach(c=>c.style.display=(c.id===tab?'block':'none'));
 });
-
+});
+// Admin toggle
+function toggleAdmin(){
+const f=document.getElementById('adminLoginForm');
+f.style.display = (f.style.display==='block')?'none':'block';
+}
 // Admin login
 function adminLogin(){
-  const user = document.getElementById('adminUser').value;
-  const pass = document.getElementById('adminPass').value;
-  const msg = document.getElementById('loginMsg');
-  if(user === 'Eldo1973' && pass === 'inside2026'){
-    isAdmin = true;
-    msg.style.color = 'green';
-    msg.innerText = 'Admin access granted!';
-    enableEditing();
-  } else {
-    msg.style.color = 'red';
-    msg.innerText = 'Invalid credentials';
-  }
+const user=document.getElementById('adminUser').value;
+const pass=document.getElementById('adminPass').value;
+const msg=document.getElementById('loginMsg');
+if(user==='Eldo1973' && pass==='inside2026'){
+isAdmin=true;
+msg.style.color='green';
+msg.innerText='Admin access granted!';
+renderAll();
+}else{msg.style.color='red';msg.innerText='Invalid credentials';}
 }
-
-// Enable editing features
-function enableEditing(){
-  const allNews = document.querySelectorAll('.news-item');
-  allNews.forEach(item=>{
-    // Add Edit button
-    const editBtn = document.createElement('button');
-    editBtn.innerText = 'Edit';
-    editBtn.className = 'edit-btn';
-    editBtn.onclick = ()=>editNews(item);
-    item.appendChild(editBtn);
-
-    // Add Delete button
-    const delBtn = document.createElement('button');
-    delBtn.innerText = 'Delete';
-    delBtn.className = 'delete-btn';
-    delBtn.onclick = ()=>item.remove();
-    item.appendChild(delBtn);
-  });
-
-  // Add "Add News" button at top
-  const main = document.querySelector('.main-content');
-  let addBtn = document.getElementById('addNewsBtn');
-  if(!addBtn){
-    addBtn = document.createElement('button');
-    addBtn.innerText = 'Add News';
-    addBtn.style.marginBottom='20px';
-    addBtn.id = 'addNewsBtn';
-    addBtn.onclick = addNews;
-    main.prepend(addBtn);
-  }
+// Load / Save news to localStorage
+function loadData(){
+const data = JSON.parse(localStorage.getItem('eldodata')||'{}');
+if(Object.keys(data).length===0){
+data.home=[{title:"School Year Kickoff!",text:"Students and staff gathered to celebrate the start of a new school year with exciting events and announcements.",img:"https://via.placeholder.com/600x300"},{title:"Club Fair Highlights",text:"Our reporters covered the annual club fair where students discovered opportunities to join new activities and meet peers.",img:"https://via.placeholder.com/600x300"}];
+data.latest=[{title:"New Cafeteria Menu",text:"The cafeteria introduces healthier options this semester, including vegan and gluten-free meals.",img:"https://via.placeholder.com/600x300"}];
+data.features=[{title:"Student Spotlight: Jane Doe",text:"Jane shares her journey as a young journalist covering school events and inspiring others to get involved.",img:"https://via.placeholder.com/600x300"}];
+data.sports=[{title:"Basketball Team Wins Championship",text:"The Eldorado High team clinched the regional championship with a thrilling last-minute play!",img:"https://via.placeholder.com/600x300"}];
+data.entertainment=[{title:"Drama Club Presents 'Romeo & Juliet'",text:"The drama club dazzles audiences with their latest performance of Shakespeare’s classic.",img:"https://via.placeholder.com/600x300"}];
+data.videos=[{title:"School Assembly Highlights",url:"https://www.youtube.com/embed/dQw4w9WgXcQ"}];
+localStorage.setItem('eldodata',JSON.stringify(data));
 }
-
-// Edit news
-function editNews(item){
-  const h3 = item.querySelector('h3');
-  const p = item.querySelector('p');
-  const img = item.querySelector('img');
-
-  const newTitle = prompt('Edit Title:', h3.innerText);
-  if(newTitle) h3.innerText = newTitle;
-  const newText = prompt('Edit Text:', p.innerText);
-  if(newText) p.innerText = newText;
-  const newImg = prompt('Edit Image URL:', img.src);
-  if(newImg) img.src = newImg;
+window.eldoData=JSON.parse(localStorage.getItem('eldodata'));
+renderAll();
 }
-
-// Add news
-function addNews(){
-  const main = document.querySelector('.tab-content:visible') || document.querySelector('.tab-content');
-  const title = prompt('News Title:');
-  const text = prompt('News Text:');
-  const img = prompt('Image URL (or leave blank):','https://via.placeholder.com/600x300');
-  if(title && text){
-    const div = document.createElement('div');
-    div.className = 'news-item';
-    div.innerHTML = `<img src="${img}" alt="News"><h3>${title}</h3><p>${text}</p>`;
-    main.appendChild(div);
-    if(isAdmin) enableEditing();
-  }
+function saveData(){localStorage.setItem('eldodata',JSON.stringify(window.eldoData));}
+// Render
+function renderAll(){
+for(const tab in eldoData){
+const container=document.getElementById(tab);
+container.innerHTML='';
+eldoData[tab].forEach((item,index)=>{
+const div=document.createElement('div');
+div.className=(tab==='videos')?'video-item':'news-item';
+if(tab==='videos'){div.innerHTML=`<h3>${item.title}</h3><iframe width="560" height="315" src="${item.url}" frameborder="0" allowfullscreen></iframe>`;}
+else{div.innerHTML=`<img src="${item.img}" alt="News"><h3>${item.title}</h3><p>${item.text}</p>`;}
+if(isAdmin){
+const editBtn=document.createElement('button');editBtn.innerText='Edit';editBtn.className='edit-btn';editBtn.onclick=()=>editItem(tab,index);div.appendChild(editBtn);
+const delBtn=document.createElement('button');delBtn.innerText='Delete';delBtn.className='delete-btn';delBtn.onclick=()=>{window.eldoData[tab].splice(index,1);saveData();renderAll();};div.appendChild(delBtn);}
+container.appendChild(div);
+});
+if(isAdmin){const main=document.querySelector('.main-content');let addBtn=document.getElementById('addNewsBtn');if(!addBtn){addBtn=document.createElement('button');addBtn.innerText='Add Item';addBtn.style.marginBottom='20px';addBtn.id='addNewsBtn';addBtn.onclick=addItem;main.prepend(addBtn);}}}
 }
+// Admin functions
+function editItem(tab,index){let item=window.eldoData[tab][index];if(tab==='videos'){const t=prompt('Edit Title',item.title);if(t)item.title=t;const u=prompt('Edit Video URL',item.url);if(u)item.url=u;}else{const t=prompt('Edit Title',item.title);if(t)item.title=t;const txt=prompt('Edit Text',item.text);if(txt)item.text=txt;const img=prompt('Edit Image URL',item.img);if(img)item.img=img;}saveData();renderAll();}
+function addItem(){const tab=prompt('Which tab? home/latest/features/sports/entertainment/videos');if(!tab || !window.eldoData[tab])return alert('Invalid tab');if(tab==='videos'){const title=prompt('Video Title:');const url=prompt('Video URL:');if(title && url) window.eldoData[tab].push({title,url});}else{const title=prompt('Title:'), text=prompt('Text:'), img=prompt('Image URL:','https://via.placeholder.com/600x300');if(title && text) window.eldoData[tab].push({title,text,img});}saveData();renderAll();}
+
+loadData();
 </script>
-
 </body>
 </html>
