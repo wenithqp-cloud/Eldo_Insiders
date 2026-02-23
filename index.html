@@ -76,7 +76,7 @@ isAdmin=true;
 msg.style.color='green';
 msg.innerText='Admin access granted!';
 closeLogin();
-document.getElementById('addSectionBtn').style.display='block'; // show add section only for admin
+document.getElementById('addSectionBtn').style.display='block';
 renderSite();
 }else{msg.style.color='red';msg.innerText='Invalid credentials';}
 }
@@ -99,6 +99,7 @@ ticker:["Welcome to Eldo Insiders!","Breaking: New club fair Friday!"]
 localStorage.setItem('eldodata',JSON.stringify(data));
 }
 window.eldoData=data;
+renderSite();
 }
 
 // Render site
@@ -108,21 +109,18 @@ nav.innerHTML="";
 const tabContents=document.getElementById('tabContents');
 tabContents.innerHTML="";
 window.eldoData.tabs.forEach((tab,index)=>{
-// create tab button
 let btn=document.createElement('button');
 btn.className="tab-btn";
 btn.innerText=tab.name;
 btn.onclick=()=>switchTab(index);
 nav.appendChild(btn);
 
-// create tab content
 let div=document.createElement('div');
 div.id="tab-"+index;
 div.style.display=(index===0?'block':'none');
 div.className="tab-content";
 tabContents.appendChild(div);
 
-// render items
 tab.items.forEach((item,i)=>renderItem(tab,index,item,i));
 
 // admin controls
@@ -143,8 +141,6 @@ delTabBtn.onclick=()=>{window.eldoData.tabs.splice(index,1);saveAndRender();}
 div.appendChild(delTabBtn);
 }
 });
-
-// highlight first tab
 document.querySelectorAll('.tab-btn')[0].classList.add('active');
 renderTicker();
 }
@@ -197,20 +193,17 @@ if(name) window.eldoData.tabs[idx].name=name;
 saveAndRender();
 }
 
-// Add new section
 document.getElementById('addSectionBtn').onclick=()=>{
 if(!isAdmin)return alert("Admin only!");
 let name=prompt("New Section Name");
 if(name) window.eldoData.tabs.push({name:name,items:[]}); saveAndRender();
 }
 
-// Ticker
 function renderTicker(){document.getElementById('ticker').innerText=(window.eldoData.ticker||[]).join(" ⚡ ");}
 document.getElementById('ticker').onclick=()=>{
 if(!isAdmin) return; let t=prompt("Edit Ticker (separate with |)",window.eldoData.ticker.join("|")); if(t) window.eldoData.ticker=t.split("|"); saveAndRender();
 }
 
-// Save and re-render
 function saveAndRender(){localStorage.setItem('eldodata',JSON.stringify(window.eldoData)); renderSite();}
 
 loadData();
