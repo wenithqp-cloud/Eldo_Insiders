@@ -30,7 +30,7 @@ body{display:flex;height:100vh;background-color:#fff8e1;color:#3b0000;overflow:h
 .close-btn{position:absolute;top:5px;right:10px;font-size:20px;font-weight:bold;cursor:pointer;color:#800000;}
 .edit-btn,.delete-btn{position:absolute;top:10px;right:10px;background:#ffd700;color:#800000;border:none;padding:5px 8px;margin-left:5px;cursor:pointer;border-radius:3px;font-weight:bold;}
 .edit-btn:hover,.delete-btn:hover{background:#e6c200;}
-#addSectionBtn{margin-top:20px;padding:10px;background:#ffd700;color:#800000;border:none;border-radius:5px;font-weight:bold;cursor:pointer;}
+#addSectionBtn{display:none;margin-top:20px;padding:10px;background:#ffd700;color:#800000;border:none;border-radius:5px;font-weight:bold;cursor:pointer;}
 #addSectionBtn:hover{background:#e6c200;}
 @media(max-width:768px){body{flex-direction:column;}.sidebar{width:100%;flex-direction:row;overflow-x:auto;}.nav-tabs{flex-direction:row;gap:10px;}.main-content{padding:15px;}}
 </style>
@@ -76,6 +76,7 @@ isAdmin=true;
 msg.style.color='green';
 msg.innerText='Admin access granted!';
 closeLogin();
+document.getElementById('addSectionBtn').style.display='block'; // show add section only for admin
 renderSite();
 }else{msg.style.color='red';msg.innerText='Invalid credentials';}
 }
