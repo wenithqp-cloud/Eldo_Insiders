@@ -38,15 +38,8 @@ body{display:flex;height:100vh;background-color:#fff8e1;color:#3b0000;overflow:h
 
 <div class="sidebar">
 <h1 id="logoButton">Eldo Insiders</h1>
-
-<div class="nav-tabs">
-<button class="tab-btn active" data-tab="home">Home</button>
-<button class="tab-btn" data-tab="latest">Latest News</button>
-<button class="tab-btn" data-tab="features">Features</button>
-<button class="tab-btn" data-tab="sports">Sports</button>
-<button class="tab-btn" data-tab="entertainment">Entertainment</button>
-<button class="tab-btn" data-tab="videos">Videos</button>
-</div>
+<div class="nav-tabs" id="navTabs"></div>
+<button style="margin-top:20px;" id="addSectionBtn">+ Add Section</button>
 </div>
 
 <!-- Modal Login -->
@@ -63,33 +56,14 @@ body{display:flex;height:100vh;background-color:#fff8e1;color:#3b0000;overflow:h
 
 <div class="main-content">
 <div id="ticker-container"><div id="ticker"></div></div>
-<div class="tab-content" id="home"></div>
-<div class="tab-content" id="latest" style="display:none"></div>
-<div class="tab-content" id="features" style="display:none"></div>
-<div class="tab-content" id="sports" style="display:none"></div>
-<div class="tab-content" id="entertainment" style="display:none"></div>
-<div class="tab-content" id="videos" style="display:none"></div>
+<div id="tabContents"></div>
 </div>
 
 <script>
-// Tabs
-const tabButtons = document.querySelectorAll('.tab-btn');
-const tabContents = document.querySelectorAll('.tab-content');
-let isAdmin = false;
-tabButtons.forEach(btn=>{
-btn.addEventListener('click',()=>{
-tabButtons.forEach(b=>b.classList.remove('active'));
-btn.classList.add('active');
-const tab = btn.getAttribute('data-tab');
-tabContents.forEach(c=>c.style.display=(c.id===tab?'block':'none'));
-});
-});
+let isAdmin=false;
+document.getElementById('logoButton').onclick=()=>document.getElementById('loginModal').style.display='flex';
+function closeLogin(){document.getElementById('loginModal').style.display='none';}
 
-// Show modal on logo click
-document.getElementById('logoButton').onclick = function(){ document.getElementById('loginModal').style.display='flex'; }
-function closeLogin(){ document.getElementById('loginModal').style.display='none'; }
-
-// Admin login
 function adminLogin(){
 const user=document.getElementById('adminUser').value;
 const pass=document.getElementById('adminPass').value;
@@ -99,56 +73,137 @@ isAdmin=true;
 msg.style.color='green';
 msg.innerText='Admin access granted!';
 closeLogin();
-renderAll();
+renderSite();
 }else{msg.style.color='red';msg.innerText='Invalid credentials';}
 }
 
-// Load / Save news to localStorage
+// Default site data
 function loadData(){
-const data = JSON.parse(localStorage.getItem('eldodata')||'{}');
-if(Object.keys(data).length===0){
-data.home=[{title:"School Year Kickoff!",text:"Students and staff gathered to celebrate the start of a new school year with exciting events and announcements.",img:"https://via.placeholder.com/600x300"}];
-data.latest=[{title:"New Cafeteria Menu",text:"The cafeteria introduces healthier options this semester, including vegan and gluten-free meals.",img:"https://via.placeholder.com/600x300"}];
-data.features=[{title:"Student Spotlight: Jane Doe",text:"Jane shares her journey as a young journalist covering school events and inspiring others to get involved.",img:"https://via.placeholder.com/600x300"}];
-data.sports=[{title:"Basketball Team Wins Championship",text:"The Eldorado High team clinched the regional championship with a thrilling last-minute play!",img:"https://via.placeholder.com/600x300"}];
-data.entertainment=[{title:"Drama Club Presents 'Romeo & Juliet'",text:"The drama club dazzles audiences with their latest performance of Shakespeare’s classic.",img:"https://via.placeholder.com/600x300"}];
-data.videos=[{title:"School Assembly Highlights",url:"https://www.youtube.com/embed/dQw4w9WgXcQ"}];
-data.ticker=["Welcome to Eldo Insiders!","Breaking: New club fair this Friday!"];
+let data=JSON.parse(localStorage.getItem('eldodata')||'{}');
+if(!data.tabs){
+data={
+tabs:[
+{name:"Home",items:[{type:"news",title:"School Year Kickoff!",text:"Students gathered to celebrate start of new school year.",img:"https://via.placeholder.com/600x300"}]},
+{name:"Latest News",items:[{type:"news",title:"New Cafeteria Menu",text:"Healthier options this semester.",img:"https://via.placeholder.com/600x300"}]},
+{name:"Features",items:[{type:"news",title:"Student Spotlight",text:"Jane shares her journey.",img:"https://via.placeholder.com/600x300"}]},
+{name:"Sports",items:[{type:"news",title:"Basketball Wins!",text:"Regional championship clinched.",img:"https://via.placeholder.com/600x300"}]},
+{name:"Entertainment",items:[{type:"news",title:"Drama Club Presents",text:"Shakespeare classic.",img:"https://via.placeholder.com/600x300"}]},
+{name:"Videos",items:[{type:"video",title:"Assembly Highlights",url:"https://www.youtube.com/embed/dQw4w9WgXcQ"}]}
+],
+ticker:["Welcome to Eldo Insiders!","Breaking: New club fair Friday!"]
+};
 localStorage.setItem('eldodata',JSON.stringify(data));
 }
-window.eldoData=JSON.parse(localStorage.getItem('eldodata'));
-renderAll();
+window.eldoData=data;
 }
-function saveData(){localStorage.setItem('eldodata',JSON.stringify(window.eldoData));}
 
-// Render
-function renderAll(){
-const ticker=document.getElementById('ticker');
-ticker.innerHTML=(window.eldoData.ticker||[]).join(" ⚡ ");
-for(const tab in eldoData){
-const container=document.getElementById(tab);
-container.innerHTML='';
-eldoData[tab].forEach((item,index)=>{
-const div=document.createElement('div');
-div.className=(tab==='videos')?'video-item':'news-item';
-if(tab==='videos'){div.innerHTML=`<h3>${item.title}</h3><iframe width="560" height="315" src="${item.url}" frameborder="0" allowfullscreen></iframe>`;}
-else{div.innerHTML=`<img src="${item.img}" alt="News"><h3>${item.title}</h3><p>${item.text}</p>`;}
+// Render site
+function renderSite(){
+const nav=document.getElementById('navTabs');
+nav.innerHTML="";
+const tabContents=document.getElementById('tabContents');
+tabContents.innerHTML="";
+window.eldoData.tabs.forEach((tab,index)=>{
+let btn=document.createElement('button');
+btn.className="tab-btn";
+btn.innerText=tab.name;
+btn.onclick=()=>switchTab(index);
+nav.appendChild(btn);
+
+let div=document.createElement('div');
+div.id="tab-"+index;
+div.style.display=(index===0?'block':'none');
+div.className="tab-content";
+tabContents.appendChild(div);
+
+tab.items.forEach((item,i)=>renderItem(tab,index,item,i));
 if(isAdmin){
-const editBtn=document.createElement('button');editBtn.innerText='Edit';editBtn.className='edit-btn';editBtn.onclick=()=>editItem(tab,index);div.appendChild(editBtn);
-const delBtn=document.createElement('button');delBtn.innerText='Delete';delBtn.className='delete-btn';delBtn.onclick=()=>{window.eldoData[tab].splice(index,1);saveData();renderAll();};div.appendChild(delBtn);}
-container.appendChild(div);
+let editTabBtn=document.createElement('button');
+editTabBtn.innerText="Edit Section";
+editTabBtn.onclick=()=>editSection(index);
+div.appendChild(editTabBtn);
+
+let delTabBtn=document.createElement('button');
+delTabBtn.innerText="Delete Section";
+delTabBtn.onclick=()=>{window.eldoData.tabs.splice(index,1);saveAndRender();};
+div.appendChild(delTabBtn);
+
+let addItemBtn=document.createElement('button');
+addItemBtn.innerText="+ Add Item";
+addItemBtn.onclick=()=>addItem(index);
+div.appendChild(addItemBtn);
+}
 });
-if(isAdmin){const main=document.querySelector('.main-content');let addBtn=document.getElementById('addNewsBtn');if(!addBtn){addBtn=document.createElement('button');addBtn.innerText='Add Item';addBtn.style.marginBottom='20px';addBtn.id='addNewsBtn';addBtn.onclick=addItem;main.prepend(addBtn);}}}
+
+// Highlight first tab
+document.querySelectorAll('.tab-btn')[0].classList.add('active');
+renderTicker();
 }
 
-// Admin functions
-function editItem(tab,index){let item=window.eldoData[tab][index];if(tab==='videos'){const t=prompt('Edit Title',item.title);if(t)item.title=t;const u=prompt('Edit Video URL',item.url);if(u)item.url=u;}else{const t=prompt('Edit Title',item.title);if(t)item.title=t;const txt=prompt('Edit Text',item.text);if(txt)item.text=txt;const img=prompt('Edit Image URL',item.img);if(img)item.img=img;}saveData();renderAll();}
-function addItem(){const tab=prompt('Which tab? home/latest/features/sports/entertainment/videos');if(!tab || !window.eldoData[tab])return alert('Invalid tab');if(tab==='videos'){const title=prompt('Video Title:');const url=prompt('Video URL:');if(title && url) window.eldoData[tab].push({title,url});}else{const title=prompt('Title:'), text=prompt('Text:'), img=prompt('Image URL:','https://via.placeholder.com/600x300');if(title && text) window.eldoData[tab].push({title,text,img});}saveData();renderAll();}
+function switchTab(idx){
+document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+document.querySelectorAll('.tab-content').forEach((c,i)=>c.style.display=(i===idx?'block':'none'));
+}
 
-// Admin ticker edit
-function editTicker(){if(!isAdmin)return;let txt=prompt("Edit Breaking News Ticker (separate items by | )",window.eldoData.ticker.join("|"));if(txt)window.eldoData.ticker=txt.split("|");saveData();renderAll();}
-document.getElementById('ticker').onclick=editTicker;
+// Render individual items
+function renderItem(tab,tabIndex,item,itemIndex){
+let container=document.getElementById('tab-'+tabIndex);
+let div=document.createElement('div');
+div.className=(item.type==="video")?"video-item":"news-item";
+if(item.type==="video") div.innerHTML=`<h3>${item.title}</h3><iframe width="560" height="315" src="${item.url}" frameborder="0" allowfullscreen></iframe>`;
+else div.innerHTML=`<img src="${item.img}"><h3>${item.title}</h3><p>${item.text}</p>`;
+if(isAdmin){
+let editBtn=document.createElement('button');editBtn.innerText='Edit';editBtn.className='edit-btn';
+editBtn.onclick=()=>editItem(tabIndex,itemIndex);div.appendChild(editBtn);
+let delBtn=document.createElement('button');delBtn.innerText='Delete';delBtn.className='delete-btn';
+delBtn.onclick=()=>{window.eldoData.tabs[tabIndex].items.splice(itemIndex,1);saveAndRender();};div.appendChild(delBtn);}
+container.appendChild(div);
+}
 
+function editItem(tabIndex,itemIndex){
+let item=window.eldoData.tabs[tabIndex].items[itemIndex];
+if(item.type==="video"){
+let t=prompt("Title",item.title); if(t)item.title=t;
+let u=prompt("Video URL",item.url); if(u)item.url=u;
+}else{
+let t=prompt("Title",item.title); if(t)item.title=t;
+let txt=prompt("Text",item.text); if(txt)item.text=txt;
+let img=prompt("Image URL",item.img); if(img)item.img=img;
+}
+saveAndRender();
+}
+
+function addItem(tabIndex){
+let type=prompt("Item type? news/video");
+if(!type || (type!=="news" && type!=="video")) return;
+if(type==="news"){let t=prompt("Title"); let txt=prompt("Text"); let img=prompt("Image URL","https://via.placeholder.com/600x300");
+if(t && txt) window.eldoData.tabs[tabIndex].items.push({type:"news",title:t,text:txt,img:img});}
+else{let t=prompt("Video Title"); let url=prompt("Video URL"); if(t && url) window.eldoData.tabs[tabIndex].items.push({type:"video",title:t,url:url});}
+saveAndRender();
+}
+
+function editSection(idx){
+let name=prompt("New Section Name",window.eldoData.tabs[idx].name);
+if(name) window.eldoData.tabs[idx].name=name;
+saveAndRender();
+}
+
+document.getElementById('addSectionBtn').onclick=()=>{
+let name=prompt("New Section Name");
+if(name) window.eldoData.tabs.push({name:name,items:[]}); saveAndRender();
+}
+
+// Ticker
+function renderTicker(){document.getElementById('ticker').innerText=(window.eldoData.ticker||[]).join(" ⚡ ");}
+document.getElementById('ticker').onclick=()=>{
+if(!isAdmin) return; let t=prompt("Edit Ticker (separate with |)",window.eldoData.ticker.join("|")); if(t) window.eldoData.ticker=t.split("|"); saveAndRender();
+}
+
+// Save and re-render
+function saveAndRender(){localStorage.setItem('eldodata',JSON.stringify(window.eldoData)); renderSite();}
+
+// Initialize
 loadData();
 </script>
 </body>
