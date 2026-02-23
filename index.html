@@ -19,30 +19,25 @@ body{display:flex;height:100vh;background-color:#fff8e1;color:#3b0000;overflow:h
 .news-item img, .video-item iframe{max-width:100%;height:auto;margin-bottom:15px;border:2px solid #ffd700;border-radius:5px;}
 .news-item h3, .video-item h3{font-size:24px;margin-bottom:10px;color:#660000;text-shadow:1px 1px #ffd700;}
 .news-item p{font-size:16px;line-height:1.5;}
-.admin-login{background-color:#fff8e1;border:2px solid #ffd700;padding:15px;border-radius:5px;margin-bottom:20px;}
-.admin-login h3{margin-bottom:10px;color:#800000;text-align:center;}
-.admin-login input{width:100%;padding:8px;margin-bottom:10px;border:1px solid #ccc;border-radius:3px;}
-.admin-login button{width:100%;padding:10px;background-color:#ffd700;color:#800000;border:none;cursor:pointer;font-weight:bold;}
-.admin-login button:hover{background-color:#e6c200;}
-.edit-btn,.delete-btn,.save-btn{position:absolute;top:10px;right:10px;background:#ffd700;color:#800000;border:none;padding:5px 8px;margin-left:5px;cursor:pointer;border-radius:3px;font-weight:bold;}
-.edit-btn:hover,.delete-btn:hover,.save-btn:hover{background:#e6c200;}
-#ticker-container{width:100%;background:#800000;color:#ffd700;overflow:hidden;border-bottom:4px solid #ffd700;padding:5px 0;margin-bottom:20px;}
+#ticker-container{width:100%;background:#800000;color:#ffd700;overflow:hidden;border-bottom:4px solid #ffd700;padding:5px 0;margin-bottom:20px;cursor:pointer;}
 #ticker{display:inline-block;white-space:nowrap;position:relative;animation:scrollTicker 20s linear infinite;font-weight:bold;}
 @keyframes scrollTicker{0%{left:100%;}100%{left:-100%;}}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;z-index:1000;}
+.modal-content{background:#fff8e1;padding:20px;border:2px solid #ffd700;border-radius:10px;width:300px;position:relative;}
+.modal-content h3{color:#800000;text-align:center;margin-bottom:10px;}
+.modal-content input{width:100%;padding:8px;margin-bottom:10px;border:1px solid #ccc;border-radius:3px;}
+.modal-content button{width:100%;padding:10px;background-color:#ffd700;color:#800000;border:none;cursor:pointer;font-weight:bold;}
+.modal-content button:hover{background-color:#e6c200;}
+.close-btn{position:absolute;top:5px;right:10px;font-size:20px;font-weight:bold;cursor:pointer;color:#800000;}
+.edit-btn,.delete-btn,.save-btn{position:absolute;top:10px;right:10px;background:#ffd700;color:#800000;border:none;padding:5px 8px;margin-left:5px;cursor:pointer;border-radius:3px;font-weight:bold;}
+.edit-btn:hover,.delete-btn:hover,.save-btn:hover{background:#e6c200;}
 @media(max-width:768px){body{flex-direction:column;}.sidebar{width:100%;flex-direction:row;overflow-x:auto;}.nav-tabs{flex-direction:row;gap:10px;}.main-content{padding:15px;}}
 </style>
 </head>
 <body>
 
 <div class="sidebar">
-<h1 onclick="toggleAdmin()">Eldo Insiders</h1>
-<div class="admin-login" id="adminLoginForm">
-<h3>Admin Login</h3>
-<input type="text" id="adminUser" placeholder="Username">
-<input type="password" id="adminPass" placeholder="Password">
-<button onclick="adminLogin()">Login</button>
-<p id="loginMsg" style="color:red;font-size:14px;text-align:center;margin-top:5px;"></p>
-</div>
+<h1 id="logoButton">Eldo Insiders</h1>
 
 <div class="nav-tabs">
 <button class="tab-btn active" data-tab="home">Home</button>
@@ -51,6 +46,18 @@ body{display:flex;height:100vh;background-color:#fff8e1;color:#3b0000;overflow:h
 <button class="tab-btn" data-tab="sports">Sports</button>
 <button class="tab-btn" data-tab="entertainment">Entertainment</button>
 <button class="tab-btn" data-tab="videos">Videos</button>
+</div>
+</div>
+
+<!-- Modal Login -->
+<div class="modal" id="loginModal">
+<div class="modal-content">
+<span class="close-btn" onclick="closeLogin()">&times;</span>
+<h3>Admin Login</h3>
+<input type="text" id="adminUser" placeholder="Username">
+<input type="password" id="adminPass" placeholder="Password">
+<button onclick="adminLogin()">Login</button>
+<p id="loginMsg" style="color:red;font-size:14px;text-align:center;margin-top:5px;"></p>
 </div>
 </div>
 
@@ -78,11 +85,9 @@ tabContents.forEach(c=>c.style.display=(c.id===tab?'block':'none'));
 });
 });
 
-// Admin toggle (logo click)
-function toggleAdmin(){
-const f=document.getElementById('adminLoginForm');
-f.style.display = (f.style.display==='block')?'none':'block';
-}
+// Show modal on logo click
+document.getElementById('logoButton').onclick = function(){ document.getElementById('loginModal').style.display='flex'; }
+function closeLogin(){ document.getElementById('loginModal').style.display='none'; }
 
 // Admin login
 function adminLogin(){
@@ -93,6 +98,7 @@ if(user==='Eldo1973' && pass==='inside2026'){
 isAdmin=true;
 msg.style.color='green';
 msg.innerText='Admin access granted!';
+closeLogin();
 renderAll();
 }else{msg.style.color='red';msg.innerText='Invalid credentials';}
 }
@@ -141,7 +147,6 @@ function addItem(){const tab=prompt('Which tab? home/latest/features/sports/ente
 
 // Admin ticker edit
 function editTicker(){if(!isAdmin)return;let txt=prompt("Edit Breaking News Ticker (separate items by | )",window.eldoData.ticker.join("|"));if(txt)window.eldoData.ticker=txt.split("|");saveData();renderAll();}
-
 document.getElementById('ticker').onclick=editTicker;
 
 loadData();
